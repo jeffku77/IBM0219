@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>TW DM Map</title>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="/javascripts/bns.js"></script>	
+        <script src="/javascripts/ibms.js"></script>
+
+
+        <style>
+
+            .axis path,
+            .axis line {
+                fill: none;
+                stroke: #000;
+                shape-rendering: crispEdges;
+            }
+
+            .alc text {
+                text-anchor: end;
+            }
+
+
+            .x.axis path {
+                display: none;
+            }
+
+            .line {
+                fill: none;
+                stroke: steelblue;
+                stroke-width: 1.5px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+            <h2>Example for Agent-Based Disease Model</h2>
+            <h4>By Chu-Chang Ku</h4>
+            <div class="row">
+                <div class="col-lg-5">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#sir">SIR</a></li>
+                        <li><a href="#rinc">Reincarnation</a></li>
+                        <li><a href="#sg">S-Growth</a></li>
+                        <li><a href="#screen">Screenning</a></li>
+                        <li><a href="#hew">H-W eq</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="sir" class="tab-pane fade in active">
+                            <h3>Susceptible Infected Recovered model</h3>
+                            <button type="button" class="btn btn-primary btn-md btn-block" onclick="simu_sir()">Simulate</button><br>
+                            <form class="form" role="form">
+                                <div class="form-group">
+                                    <label for="S">Number of The Susceptible:</label>
+                                    <input type="number" class="form-control" id="S" min="1" max="200" value="99" step="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="I">Number of The Infected:</label>
+                                    <input type="number" class="form-control" id="I" min="0" max="100" value="1" step="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="R">Number of The Recovered:</label>
+                                    <input type="number" class="form-control" id="R" min="0" max="200" value="0" step="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="beta">Transmission Rate:</label>
+                                    <input type="number" class="form-control" id="beta" min="0" step="0.01" value='1.5'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="gamma">Recovery Rate:</label>
+                                    <input type="number" class="form-control" id="gamma" min="0" step="0.01" value='0.2'>
+                                </div>                            
+
+                                <div class="form-group">
+                                    <label for="to">Time Span:</label>
+                                    <input type="number" class="form-control" id="to" min="0" max="1000" step='1' value='10'>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <div id="rinc" class="tab-pane fade">
+                            <h3>Reincarnation Model</h3>
+                            <button type="button" class="btn btn-primary btn-md btn-block" onclick="simu_rinc()">Simulate</button><br> 
+                            <form class="form" role="form">
+                                <div class="form-group">
+                                    <label for="npop">Population Size:</label>
+                                    <input type="number" class="form-control" id="npop" min="5" max="5000" value="200" step="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rDeath">Death Rate:</label>
+                                    <input type="number" class="form-control" id="rDeath" min="0" step="0.001" value='0.0125'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="to">Time Span:</label>
+                                    <input type="number" class="form-control" id="to" min="0" max="1000" step='1' value='10'>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="sg" class="tab-pane fade">
+                            <h3>S-Shaped Growth Model</h3>
+                            <button type="button" class="btn btn-primary btn-md btn-block" onclick="simu_sg()">Simulate</button><br>
+                            <form class="form" role="form">
+                                <div class="form-group">
+                                    <label for="npop">Population Size:</label>
+                                    <input type="number" class="form-control" id="npop" min="5" max="5000" value="200" step="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rDeath">Death Rate:</label>
+                                    <input type="number" class="form-control" id="rDeath" min="0" step="0.001" value='0.0125'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rBir">Intrinsic Birth Rate:</label>
+                                    <input type="number" class="form-control" id="rBir" min="0" step="0.001" value='0.025'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="k">Capacity:</label>
+                                    <input type="number" class="form-control" id="k" min="0" min="5" max="5000" value="1000" step="1">
+                                </div>                                
+
+                                <div class="form-group">
+                                    <label for="to">Time Span:</label>
+                                    <input type="number" class="form-control" id="to" min="0" max="1000" step='1' value='100'>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="screen" class="tab-pane fade">
+                            <h3>Screening</h3>
+                            <button type="button" class="btn btn-primary btn-md btn-block" onclick="simu_screen()">Simulate</button><br>
+                            <form class="form" role="form">
+                                <div class="form-group">
+                                    <label for="npop">Population Size:</label>
+                                    <input type="number" class="form-control" id="npop" min="5" max="5000" value="200" step="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rProg">Disease Progression Rate:</label>
+                                    <input type="number" class="form-control" id="rProg" min="0" step="0.001" value='0.0125'>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="tr">Cure Rate:</label>
+                                    <input type="number" class="form-control" id="tr" min="0" step="0.001" value='5'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="sen">Sensitivity for Scranning:</label>
+                                    <input type="number" class="form-control" id="sen" min="0" max='1' step="0.01" value='0.5'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rDeath">Death Rate:</label>
+                                    <input type="number" class="form-control" id="rDeath" min="0" step="0.001" value='0.0125'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rDeathDz">Disease Specific Death Rate:</label>
+                                    <input type="number" class="form-control" id="rDeathDz" min="0" step="0.001" value='0.0125'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rBir">Intrinsic Birth Rate:</label>
+                                    <input type="number" class="form-control" id="rBir" min="0" step="0.001" value='0.025'>
+                                </div>                             
+
+                                <div class="form-group">
+                                    <label for="to">Time Span:</label>
+                                    <input type="number" class="form-control" id="to" min="0" max="1000" step='1' value='10'>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="hew" class="tab-pane fade">
+                            <h3>Hardy Weinberg Equilibrium</h3>
+                            <button type="button" class="btn btn-primary btn-md btn-block" onclick="simu_hwe()">Simulate</button><br>
+                            <form class="form" role="form">
+                                <div class="form-group">
+                                    <label for="npop">Population Size:</label>
+                                    <input type="number" class="form-control" id="npop" min="5" max="5000" value="200" step="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rDeath">Death Rate:</label>
+                                    <input type="number" class="form-control" id="rDeath" min="0" step="0.001" value='0.0125'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="fqA">Frequence of A:</label>
+                                    <input type="number" class="form-control" id="fqA" min="0" max='1' step="0.001" value='0.3'>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="to">Time Span:</label>
+                                    <input type="number" class="form-control" id="to" min="0" max="1000" step='1' value='100'>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div id="ts">
+                        <p id='now'></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            $(document).ready(function(){
+                $(".nav-tabs a").click(function(){
+                    $(this).tab('show');
+                    $("#now").text($(this).text());
+                });
+            });
+        </script>
+
+    </body>
+
+    </body>
+</html>
